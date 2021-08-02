@@ -1,10 +1,10 @@
 import assert from "assert";
 
-import { objectContain } from "../utils";
+import { partialDeepEquals } from "../utils";
 
 describe("Test utils ", () => {
     it("objectContain", async () => {
-        assert(objectContain(
+        assert(partialDeepEquals(
             {
                 name: "John Wick",
                 old: 20,
@@ -13,17 +13,12 @@ describe("Test utils ", () => {
             {
 
             }
-        ), "Not pass with empty expect");
-
-        assert(objectContain(
+        ), "Did not match empty expect");
+        assert(partialDeepEquals(
             [{a: [1,2,3]}, {a: [1,2]}],
-            [
-                {a: {length: 3}},
-                {a: {length: 2}}
-            ]
-        ));
-
-        assert(objectContain(
+            [{a: [1,2,3]}, {a: [1,2]}]
+        ), "Did not match same arrays");
+        assert(partialDeepEquals(
             {
                 name: "John Wick",
                 old: 20,
@@ -33,9 +28,9 @@ describe("Test utils ", () => {
                 vip: true,
                 old: 20
             }
-        ));
-
-        assert(!objectContain(
+        ), "Did not match same partial properties");
+        // do not match incorrect propeties
+        assert(!partialDeepEquals(
             {
                 name: "John Wick",
                 old: 20,
@@ -45,9 +40,9 @@ describe("Test utils ", () => {
                 vip: false,
                 old: 19
             }
-        ));
-
-        assert(!objectContain(
+        ), "Matched different properties");
+        // do not match missing property
+        assert(!partialDeepEquals(
             {
                 name: "John Wick",
                 old: 20,
@@ -60,22 +55,7 @@ describe("Test utils ", () => {
                 }
             }
         ));
-
-        assert(!objectContain(
-            {
-                name: "John Wick",
-                old: 20,
-                vip: true
-            },
-            {
-                vip: true,
-                child: {
-                    name: ""
-                }
-            }
-        ));
-
-        assert(!objectContain(
+        assert(!partialDeepEquals(
             {
                 name: "John Wick",
                 old: 20,
@@ -90,9 +70,8 @@ describe("Test utils ", () => {
                     name: ""
                 }
             }
-        ));
-
-        assert(!objectContain(
+        ), "Matched incorrect child property");
+        assert(!partialDeepEquals(
             {
                 name: "John Wick",
                 old: 20,
@@ -113,9 +92,8 @@ describe("Test utils ", () => {
                     }
                 }
             }
-        ));
-
-        assert(objectContain(
+        ), "Matched incorrected 2-nested property");
+        assert(partialDeepEquals(
             {
                 name: "John Wick",
                 old: 20,
@@ -136,6 +114,21 @@ describe("Test utils ", () => {
                     }
                 }
             }
-        ));
+        ), "Did not match exact child properties");
+        assert(partialDeepEquals(
+            {
+                name: "John Wick",
+                values: [{
+                    name: "a",
+                }, {
+                    name: "b",
+                }]
+            },
+            {
+                values: [{
+                    name: "a",
+                }]
+            }
+        ), "Did not match partial child array");
     });
 });

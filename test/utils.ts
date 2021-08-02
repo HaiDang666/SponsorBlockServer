@@ -13,29 +13,14 @@ export type Done = (err?: any) => void;
  *
  * Check object contains expected properties
  */
-export const objectContain = (actual: Record<string, any>, expect: Record<string, any>): boolean => {
-    if (typeof actual !== "object" || typeof expect !== "object") {
-        throw new Error("actual and expect must be type of object");
-    }
-
-    const expectKeys = Object.keys(expect);
-
-    for(let i = 0; i < expectKeys.length; i += 1) {
-        const key = expectKeys[i];
-        if (!Object.prototype.hasOwnProperty.call(actual, key)) {
-            return false;
-        } else {
-            if (typeof actual[key] === "object") {
-                if (!objectContain(actual[key], expect[key])) {
-                    return false;
-                }
-            } else {
-                if (actual[key] !== expect[key]) {
-                    return false;
-                }
-            }
+export const partialDeepEquals = (actual: Record<string, any>, expected: Record<string, any>): boolean => {
+    // loop over key, value of expected
+    for (const [ key, value ] of Object.entries(expected)) {
+        // if value is object or array, recurse
+        if (Array.isArray(value) || typeof value === "object") {
+            if (!partialDeepEquals(actual?.[key], value)) return false;
         }
+        else if (actual?.[key] !== value) return false;
     }
-
     return true;
 };
